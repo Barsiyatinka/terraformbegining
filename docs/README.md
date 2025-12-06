@@ -18,15 +18,64 @@
 
 ```
 **Ответ**  
+Версии ПО в системе:
 
- 
-Видно, что накаталог зашифрован.
-<img src="img/screen_3.png" width="100%">  
+<img src="img/img_1.jpg" width="100%">   
 
+Скачаем все необходимые зависимости  
 
+<img src="img/img_2.jpg" width="100%">  
+<img src="img/img_3.jpg" width="100%"> 
 
-**Задание 2.**  
-```
+Согласно файлу .gitignore  личную, секретную информацию допустимо хранить в файле  
+**personal.auto.tfvars**
 
-```
-**Ответ**  
+Выполним код проекта и предоставим ключ согласно заданию:  
+
+<img src="img/img_4.jpg" width="100%"> 
+
+<img src="img/img_5.jpg" width="100%">   
+Исправим код согласно заданию и проведём проверку:  
+<img src="img/img_6.jpg" width="100%">   
+
+resource "docker_image" { ... }  — отсутствует имя ресурса.  
+
+Контейнер ссылается на несуществующий ресурс random_password.random_string_FAKE  
+
+Ошибочный атрибут .resulT  
+
+Имя ресурса "1nginx" начинается с цифры — Terraform так не допускает.  
+
+Выполним код: 
+
+<img src="img/img_7.jpg" width="100%">   
+
+Заменим имя контейнера и посмотрим как оно применилось:  
+
+<img src="img/img_8.jpg" width="100%">   
+
+<img src="img/img_9.jpg" width="100%">   
+
+Опасность -auto-approve: Terraform применит любые изменения без показа плана и без подтверждения.
+Можно случайно удалить рабочие контейнеры, ВМ, сети, базы данных — без предупреждения.
+
+Зачем нужен:
+Когда пишут автоматизацию, CI/CD, GitLab CI, GitHub Actions — где некому нажимать yes, а так же в сценариях полностью автоматического деплоя.  
+
+Удалим все ресурсы:  
+
+<img src="img/img_10.jpg" width="100%">
+
+<img src="img/img_11.jpg" width="100%">  
+
+nginx:latest не удалился потому что в main.tf есть строчка keep_locally = true
+
+Это означает: даже после terraform destroy образ останется на машине.  
+
+Вот цитата из официальной документации Terraform для ресурса docker_image:  
+
+keep_locally (Boolean)
+If true, the image will be kept locally after destroy.
+
+То есть terraform удаляет только сам ресурс в своём состоянии, но не удаляет сам docker-image.
+
